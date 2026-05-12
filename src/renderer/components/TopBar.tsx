@@ -2,8 +2,8 @@ import React from 'react';
 import styles from './TopBar.module.css';
 
 interface Props {
-  columns: number;
-  onColumnsChange: (n: number) => void;
+  columns: number | 'auto';
+  onColumnsChange: (n: number | 'auto') => void;
   onNewTerminal: () => void;
   pendingCount: number;
   totalCount: number;
@@ -18,8 +18,9 @@ export function TopBar({ columns, onColumnsChange, onNewTerminal, pendingCount, 
         <select
           className={styles.layoutSelect}
           value={columns}
-          onChange={e => onColumnsChange(Number(e.target.value))}
+          onChange={e => onColumnsChange(e.target.value === 'auto' ? 'auto' : Number(e.target.value))}
         >
+          <option value="auto">Auto</option>
           <option value={1}>1 column</option>
           <option value={2}>2 columns</option>
           <option value={3}>3 columns</option>

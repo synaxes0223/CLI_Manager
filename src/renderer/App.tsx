@@ -5,15 +5,20 @@ import { TerminalGrid } from './components/TerminalGrid';
 import { MaximizeOverlay } from './components/MaximizeOverlay';
 import { NewTerminalDialog } from './components/NewTerminalDialog';
 
+function autoColumns(count: number): number {
+  return Math.min(4, Math.ceil(Math.sqrt(Math.max(1, count))));
+}
+
 export function App() {
   const { terminals, createTerminal, destroyTerminal, renameTerminal } = useTerminals();
-  const [columns, setColumns]         = useState(2);
+  const [columns, setColumns]         = useState<number | 'auto'>('auto');
   const [maximizedId, setMaximizedId] = useState<string | null>(null);
   const [showDialog, setShowDialog]   = useState(false);
   const [lastPath, setLastPath]       = useState('C:\\');
 
-  const pendingCount  = terminals.filter(t => t.status === 'pending').length;
-  const maximizedTerm = terminals.find(t => t.id === maximizedId);
+  const pendingCount    = terminals.filter(t => t.status === 'pending').length;
+  const maximizedTerm   = terminals.find(t => t.id === maximizedId);
+  const effectiveColumns = columns === 'auto' ? autoColumns(terminals.length) : columns;
 
   async function handleCreate(path: string, title?: string) {
     setLastPath(path);
@@ -43,7 +48,7 @@ export function App() {
       />
       <TerminalGrid
         terminals={terminals}
-        columns={columns}
+        columns={effectiveColumns}
         onMaximize={setMaximizedId}
         onClose={handleClose}
         onRename={renameTerminal}
