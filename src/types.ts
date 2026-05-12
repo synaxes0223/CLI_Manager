@@ -17,7 +17,9 @@ export const IPC = {
   PTY_DATA:    'pty:data',
   PTY_STATUS:  'pty:status',
   PTY_EXIT:    'pty:exit',
-  DIALOG_BROWSE: 'dialog:browse-folder',
+  DIALOG_BROWSE:   'dialog:browse-folder',
+  CLIPBOARD_READ:  'clipboard:read',
+  CLIPBOARD_WRITE: 'clipboard:write',
 } as const;
 
 export interface PtyCreatePayload  { path: string; title?: string }

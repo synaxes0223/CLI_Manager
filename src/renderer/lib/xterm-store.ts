@@ -1,9 +1,7 @@
 import type { Terminal } from '@xterm/xterm';
-import type { FitAddon } from '@xterm/addon-fit';
 
 export interface XtermEntry {
   term: Terminal;
-  fit: FitAddon;
 }
 
 const store = new Map<string, XtermEntry>();

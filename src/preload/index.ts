@@ -7,11 +7,13 @@ import type {
 } from '../types';
 
 contextBridge.exposeInMainWorld('api', {
-  createPty:    (p: PtyCreatePayload): Promise<PtyCreatedPayload> => ipcRenderer.invoke(IPC.PTY_CREATE, p),
-  sendInput:    (p: PtyInputPayload)  => ipcRenderer.send(IPC.PTY_INPUT,   p),
-  resizePty:    (p: PtyResizePayload) => ipcRenderer.send(IPC.PTY_RESIZE,  p),
-  destroyPty:   (p: PtyDestroyPayload) => ipcRenderer.send(IPC.PTY_DESTROY, p),
-  browseFolder: (): Promise<string | null> => ipcRenderer.invoke(IPC.DIALOG_BROWSE),
+  createPty:      (p: PtyCreatePayload): Promise<PtyCreatedPayload> => ipcRenderer.invoke(IPC.PTY_CREATE, p),
+  sendInput:      (p: PtyInputPayload)  => ipcRenderer.send(IPC.PTY_INPUT,   p),
+  resizePty:      (p: PtyResizePayload) => ipcRenderer.send(IPC.PTY_RESIZE,  p),
+  destroyPty:     (p: PtyDestroyPayload) => ipcRenderer.send(IPC.PTY_DESTROY, p),
+  browseFolder:   (): Promise<string | null> => ipcRenderer.invoke(IPC.DIALOG_BROWSE),
+  readClipboard:  (): Promise<string> => ipcRenderer.invoke(IPC.CLIPBOARD_READ),
+  writeClipboard: (text: string): Promise<void> => ipcRenderer.invoke(IPC.CLIPBOARD_WRITE, text),
 
   onData: (cb: (p: PtyDataPayload) => void) => {
     const fn = (_: Electron.IpcRendererEvent, p: PtyDataPayload) => cb(p);

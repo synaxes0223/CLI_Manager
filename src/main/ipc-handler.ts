@@ -1,4 +1,4 @@
-import { ipcMain, BrowserWindow, dialog } from 'electron';
+import { ipcMain, BrowserWindow, dialog, clipboard } from 'electron';
 import { createPtyManager } from './pty-manager';
 import { IPC } from '../types';
 import type { PtyCreatePayload, PtyInputPayload, PtyResizePayload, PtyDestroyPayload } from '../types';
@@ -35,10 +35,15 @@ export function setupIpc(win: BrowserWindow): () => void {
     return result.canceled ? null : result.filePaths[0];
   });
 
+  ipcMain.handle(IPC.CLIPBOARD_READ,  () => clipboard.readText());
+  ipcMain.handle(IPC.CLIPBOARD_WRITE, (_e, text: string) => clipboard.writeText(text));
+
   return () => {
     mgr.destroyAll();
     ipcMain.removeHandler(IPC.PTY_CREATE);
     ipcMain.removeHandler(IPC.DIALOG_BROWSE);
+    ipcMain.removeHandler(IPC.CLIPBOARD_READ);
+    ipcMain.removeHandler(IPC.CLIPBOARD_WRITE);
     ipcMain.removeListener(IPC.PTY_INPUT,   onInput);
     ipcMain.removeListener(IPC.PTY_RESIZE,  onResize);
     ipcMain.removeListener(IPC.PTY_DESTROY, onDestroy);

@@ -23,17 +23,18 @@ Two features:
 
 ### Page size (auto-calculated from window)
 
-A `usePageSize(cols: number): number` hook computes how many terminals fit per page:
+A `usePageSize(cols: number, gridRef: RefObject<HTMLDivElement>): number` hook computes how many terminals fit per page. It attaches a `ResizeObserver` to the grid container element directly — this avoids any hardcoded topbar height constant and automatically accounts for whatever space the topbar actually consumes.
 
 ```
-availableH = window.innerHeight - topbarHeight   // topbar ~42px
-cellH      = (window.innerWidth / cols) / 2      // target 2:1 aspect ratio per cell
-gap        = 6                                   // existing grid gap
+availableH = gridRef.current.clientHeight
+availableW = gridRef.current.clientWidth
+cellH      = (availableW / cols) / 2        // target 2:1 aspect ratio per cell
+gap        = 6                              // existing grid gap in px
 maxRows    = Math.max(1, Math.floor((availableH + gap) / (cellH + gap)))
 pageSize   = cols * maxRows
 ```
 
-The hook re-runs on `window` resize via a `ResizeObserver` or `resize` event listener.
+The hook returns a stable `pageSize` number and re-runs whenever the grid container resizes.
 
 ### 3-terminal special case
 

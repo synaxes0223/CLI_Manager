@@ -1,7 +1,10 @@
 import React, { useEffect, useRef } from 'react';
+import { Terminal } from '@xterm/xterm';
+import { FitAddon } from '@xterm/addon-fit';
+import '@xterm/xterm/css/xterm.css';
 import { xtermStore } from '../lib/xterm-store';
+import { ptyBus } from '../lib/pty-bus';
 import type { TerminalState } from '../../types';
-import type { IDisposable } from '@xterm/xterm';
 import styles from './MaximizeOverlay.module.css';
 
 interface Props {
@@ -13,38 +16,69 @@ interface Props {
 export function MaximizeOverlay({ terminal, onMinimize, onClose }: Props) {
   const { id, path, title, status } = terminal;
   const containerRef = useRef<HTMLDivElement>(null);
-  const inputDisposable = useRef<IDisposable | null>(null);
 
   useEffect(() => {
     const container = containerRef.current;
-    const entry = xtermStore.get(id);
-    if (!container || !entry) return;
-    if (!entry.term.element) return;
+    if (!container) return;
 
-    // Move xterm DOM element into the overlay container
-    container.appendChild(entry.term.element);
-    entry.term.options.disableStdin = false;
-    entry.fit.fit();
-    window.api.resizePty({ id, cols: entry.term.cols, rows: entry.term.rows });
+    // Fresh terminal at the overlay's actual size — avoids reflow of old narrow-width content
+    const term = new Terminal({
+      theme: { background: '#0d1117', foreground: '#c9d1d9', cursor: '#c9d1d9' },
+      fontSize: 11,
+      fontFamily: 'Consolas, "Courier New", monospace',
+      scrollback: 5000,
+      disableStdin: false,
+      copyOnSelect: true,
+    });
+    const fit = new FitAddon();
+    term.loadAddon(fit);
+    term.open(container);
+    fit.fit();
 
-    // Wire keyboard input to PTY
-    inputDisposable.current = entry.term.onData(data =>
-      window.api.sendInput({ id, data })
-    );
+    // Replay buffered output at the correct column width before subscribing to live data
+    const buffer = ptyBus.getBuffer(id);
+    if (buffer) term.write(buffer);
 
-    // Refocus xterm so keystrokes register immediately
-    entry.term.focus();
+    window.api.resizePty({ id, cols: term.cols, rows: term.rows });
+
+    const unsub = ptyBus.subscribe(id, data => term.write(data));
+    const inputDisposable = term.onData(data => window.api.sendInput({ id, data }));
+
+    // Bridge copy/paste to Electron's native clipboard (navigator.clipboard is blocked by default)
+    term.attachCustomKeyEventHandler(e => {
+      if (e.type !== 'keydown') return true;
+      if (e.ctrlKey && e.shiftKey && e.key === 'C') {
+        const sel = term.getSelection();
+        if (sel) window.api.writeClipboard(sel);
+        return false;
+      }
+      if (e.ctrlKey && e.shiftKey && e.key === 'V') {
+        window.api.readClipboard().then(text => {
+          if (text) window.api.sendInput({ id, data: text });
+        });
+        return false;
+      }
+      return true;
+    });
+
+    term.focus();
+
+    const observer = new ResizeObserver(() => {
+      fit.fit();
+      window.api.resizePty({ id, cols: term.cols, rows: term.rows });
+    });
+    observer.observe(container);
 
     return () => {
-      // Move element back to the cell container
-      const cellContainer = document.getElementById(`cell-xterm-${id}`);
-      if (cellContainer && entry.term.element && entry.term.element.parentNode === container) {
-        cellContainer.appendChild(entry.term.element);
+      unsub();
+      observer.disconnect();
+      inputDisposable.dispose();
+      term.dispose();
+      // Restore PTY to the fixed preview size used by the grid cell
+      const cellEntry = xtermStore.get(id);
+      if (cellEntry) {
+        window.api.resizePty({ id, cols: cellEntry.term.cols, rows: cellEntry.term.rows });
       }
-      entry.term.options.disableStdin = true;
-      inputDisposable.current?.dispose();
-      inputDisposable.current = null;
-      entry.fit.fit();
     };
   }, [id]);
 
