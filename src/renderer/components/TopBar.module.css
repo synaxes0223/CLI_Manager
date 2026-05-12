@@ -1,0 +1,71 @@
+.bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 12px;
+  height: 44px;
+  background: #161b22;
+  border-bottom: 1px solid #30363d;
+  flex-shrink: 0;
+  -webkit-app-region: drag;
+}
+
+.title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #58a6ff;
+  font-family: system-ui, sans-serif;
+  -webkit-app-region: no-drag;
+}
+
+.controls {
+  display: flex;
+  gap: 6px;
+  -webkit-app-region: no-drag;
+}
+
+.newBtn {
+  background: #238636;
+  border: 1px solid #2ea043;
+  color: #fff;
+  font-size: 12px;
+  padding: 3px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 600;
+}
+.newBtn:hover { background: #2ea043; }
+
+.layoutSelect {
+  background: #21262d;
+  border: 1px solid #30363d;
+  color: #c9d1d9;
+  font-size: 12px;
+  padding: 3px 6px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.right {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  -webkit-app-region: no-drag;
+}
+
+.pendingBadge {
+  background: #da3633;
+  color: #fff;
+  font-size: 11px;
+  padding: 1px 8px;
+  border-radius: 10px;
+  font-family: monospace;
+  animation: fadein 0.2s;
+}
+
+.openCount {
+  color: #8b949e;
+  font-size: 11px;
+  font-family: monospace;
+}

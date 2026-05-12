@@ -1,0 +1,23 @@
+.grid {
+  display: grid;
+  gap: 6px;
+  padding: 8px;
+  overflow-y: auto;
+  flex: 1;
+  align-content: start;
+}
+
+.addCell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #161b22;
+  border: 1px dashed #30363d;
+  border-radius: 6px;
+  height: 160px;
+  cursor: pointer;
+  color: #484f58;
+  font-size: 24px;
+  transition: border-color 0.15s, color 0.15s;
+}
+.addCell:hover { border-color: #58a6ff; color: #58a6ff; }
