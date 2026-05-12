@@ -69,3 +69,8 @@
   font-size: 11px;
   font-family: monospace;
 }
+
+@keyframes fadein {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}

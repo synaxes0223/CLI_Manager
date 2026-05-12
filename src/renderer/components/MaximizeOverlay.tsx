@@ -19,6 +19,7 @@ export function MaximizeOverlay({ terminal, onMinimize, onClose }: Props) {
     const container = containerRef.current;
     const entry = xtermStore.get(id);
     if (!container || !entry) return;
+    if (!entry.term.element) return;
 
     // Move xterm DOM element into the overlay container
     container.appendChild(entry.term.element);
@@ -37,7 +38,7 @@ export function MaximizeOverlay({ terminal, onMinimize, onClose }: Props) {
     return () => {
       // Move element back to the cell container
       const cellContainer = document.getElementById(`cell-xterm-${id}`);
-      if (cellContainer && entry.term.element.parentNode === container) {
+      if (cellContainer && entry.term.element && entry.term.element.parentNode === container) {
         cellContainer.appendChild(entry.term.element);
       }
       entry.term.options.disableStdin = true;
