@@ -1,13 +1,36 @@
 {
   "name": "cli-manager",
   "version": "0.1.0",
-  "description": "Local terminal session manager",
+  "description": "Local terminal session manager for Claude Code and multi-terminal workflows",
   "main": "out/main/index.js",
   "scripts": {
     "dev": "electron-vite dev",
     "build": "electron-vite build",
+    "package": "electron-vite build && electron-builder",
     "start": "electron .",
     "test": "vitest run src/main/__tests__"
+  },
+  "build": {
+    "appId": "com.personal.cli-manager",
+    "productName": "CLI Manager",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "out/**"
+    ],
+    "extraResources": [],
+    "win": {
+      "target": [
+        { "target": "nsis", "arch": ["x64"] }
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
+    }
   },
   "dependencies": {
     "@xterm/addon-fit": "^0.10.0",
