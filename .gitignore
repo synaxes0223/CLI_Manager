@@ -3,3 +3,4 @@ dist/
 dist-electron/
 out/
 .superpowers/
+electron.vite.config.*.mjs
