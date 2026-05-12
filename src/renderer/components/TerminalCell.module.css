@@ -95,6 +95,7 @@
   border-radius: 3px;
   background: #0d1117;
   pointer-events: none;
+  position: relative;
 }
 
 .exited {
@@ -105,4 +106,20 @@
   font-size: 10px;
   color: #8b949e;
   font-family: monospace;
+}
+
+.grip {
+  color: #484f58;
+  cursor: grab;
+  font-size: 12px;
+  padding: 0 3px;
+  user-select: none;
+  flex-shrink: 0;
+}
+
+.grip:hover { color: #8b949e; }
+
+.dragOver {
+  border-color: #3fb950 !important;
+  background: #0d2119;
 }
