@@ -30,7 +30,7 @@ A local desktop app for managing multiple terminal sessions in one window. Built
 ## Getting Started
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/cli-manager.git
+git clone https://github.com/synaxes0223/CLI_Manager.git
 cd cli-manager
 npm install
 npm run dev
