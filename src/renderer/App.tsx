@@ -46,6 +46,13 @@ export function App() {
     return () => document.removeEventListener('keydown', onKeyDown);
   }, [maximizedId, totalPages]);
 
+  // Clear draggedId whenever a drag ends (even if dropped outside any cell)
+  useEffect(() => {
+    function onDragEnd() { setDraggedId(null); }
+    document.addEventListener('dragend', onDragEnd);
+    return () => document.removeEventListener('dragend', onDragEnd);
+  }, []);
+
   // Slice terminals for current page and pad with nulls for ghost slots
   const pageStart = page * pageSize;
   const pageSlice = terminals.slice(pageStart, pageStart + pageSize);
