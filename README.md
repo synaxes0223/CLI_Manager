@@ -29,19 +29,19 @@ npm run dev
 
 `npm run dev` starts the Electron app in development mode with hot reload.
 
-## Building a Windows Installer (.exe)
+## Building a Portable .exe
 
 ```bash
 npm run package
 ```
 
-This compiles the app and produces an NSIS installer at `release/CLI Manager Setup x.y.z.exe`. Run the installer to install the app and create a desktop shortcut — no terminal required to launch after that.
+Produces a single portable executable at `release/CLI Manager x.y.z.exe`. Double-click it to launch — no installation required. You can move or copy it anywhere.
 
-> **Windows symlink requirement:** electron-builder's code-signing toolkit contains symlinks. Windows blocks these for standard users. Fix with either:
+> **Windows symlink requirement:** electron-builder's toolkit contains symlinks. Windows blocks these for standard users. Fix with either:
 > - **Developer Mode** (recommended): Settings → Privacy & Security → For developers → turn on Developer Mode, then re-run `npm run package`
 > - **Run as Administrator**: open your terminal as Administrator and run `npm run package`
 >
-> **First build** also downloads Electron binaries (~80 MB) and may take a few minutes.
+> **First build** downloads Electron binaries (~80 MB) and may take a few minutes.
 
 ## Scripts
 
