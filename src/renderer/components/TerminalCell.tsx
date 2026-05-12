@@ -45,8 +45,13 @@ export function TerminalCell({ terminal, onMaximize, onClose, onRename }: Props)
       unsub();
       observer.disconnect();
       xtermStore.remove(id);
+      term.dispose();
     };
   }, [id]);
+
+  useEffect(() => {
+    if (!editing) setDraft(title ?? '');
+  }, [title, editing]);
 
   function commitRename() {
     setEditing(false);
