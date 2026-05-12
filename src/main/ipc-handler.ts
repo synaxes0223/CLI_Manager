@@ -5,9 +5,9 @@ import type { PtyCreatePayload, PtyInputPayload, PtyResizePayload, PtyDestroyPay
 
 export function setupIpc(win: BrowserWindow): () => void {
   const mgr = createPtyManager({
-    onData:   (id, data)   => win.webContents.send(IPC.PTY_DATA,   { id, data }),
-    onStatus: (id, status) => win.webContents.send(IPC.PTY_STATUS, { id, status }),
-    onExit:   (id, code)   => win.webContents.send(IPC.PTY_EXIT,   { id, code }),
+    onData:   (id, data)   => { if (!win.isDestroyed()) win.webContents.send(IPC.PTY_DATA,   { id, data }); },
+    onStatus: (id, status) => { if (!win.isDestroyed()) win.webContents.send(IPC.PTY_STATUS, { id, status }); },
+    onExit:   (id, code)   => { if (!win.isDestroyed()) win.webContents.send(IPC.PTY_EXIT,   { id, code }); },
   });
 
   ipcMain.handle(IPC.PTY_CREATE, (_e, p: PtyCreatePayload) => {
@@ -15,15 +15,19 @@ export function setupIpc(win: BrowserWindow): () => void {
     return { id };
   });
 
-  ipcMain.on(IPC.PTY_INPUT,   (_e, p: PtyInputPayload)   => mgr.write(p.id, p.data));
-  ipcMain.on(IPC.PTY_RESIZE,  (_e, p: PtyResizePayload)  => mgr.resize(p.id, p.cols, p.rows));
-  ipcMain.on(IPC.PTY_DESTROY, (_e, p: PtyDestroyPayload) => mgr.destroy(p.id));
+  const onInput   = (_e: Electron.IpcMainEvent, p: PtyInputPayload)   => mgr.write(p.id, p.data);
+  const onResize  = (_e: Electron.IpcMainEvent, p: PtyResizePayload)  => mgr.resize(p.id, p.cols, p.rows);
+  const onDestroy = (_e: Electron.IpcMainEvent, p: PtyDestroyPayload) => mgr.destroy(p.id);
+
+  ipcMain.on(IPC.PTY_INPUT,   onInput);
+  ipcMain.on(IPC.PTY_RESIZE,  onResize);
+  ipcMain.on(IPC.PTY_DESTROY, onDestroy);
 
   return () => {
     mgr.destroyAll();
     ipcMain.removeHandler(IPC.PTY_CREATE);
-    ipcMain.removeAllListeners(IPC.PTY_INPUT);
-    ipcMain.removeAllListeners(IPC.PTY_RESIZE);
-    ipcMain.removeAllListeners(IPC.PTY_DESTROY);
+    ipcMain.removeListener(IPC.PTY_INPUT,   onInput);
+    ipcMain.removeListener(IPC.PTY_RESIZE,  onResize);
+    ipcMain.removeListener(IPC.PTY_DESTROY, onDestroy);
   };
 }

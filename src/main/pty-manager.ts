@@ -15,6 +15,7 @@ export function createPtyManager(callbacks: PtyManagerCallbacks) {
     detector: ReturnType<typeof createPendingDetector>;
   };
   const map = new Map<string, Entry>();
+  const destroyed = new Set<string>();
 
   return {
     create(path: string, title: string | undefined): string {
@@ -41,7 +42,10 @@ export function createPtyManager(callbacks: PtyManagerCallbacks) {
       pty.onExit(({ exitCode }) => {
         detector.destroy();
         map.delete(id);
-        callbacks.onExit(id, exitCode ?? 0);
+        if (!destroyed.has(id)) {
+          callbacks.onExit(id, exitCode ?? 0);
+        }
+        destroyed.delete(id);
       });
 
       map.set(id, { pty, detector });
@@ -59,6 +63,7 @@ export function createPtyManager(callbacks: PtyManagerCallbacks) {
     destroy(id: string) {
       const entry = map.get(id);
       if (!entry) return;
+      destroyed.add(id);
       entry.detector.destroy();
       entry.pty.kill();
       map.delete(id);
