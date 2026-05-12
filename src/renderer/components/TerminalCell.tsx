@@ -95,14 +95,18 @@ export function TerminalCell({ terminal, style, onMaximize, onClose, onRename, o
       style={style}
       onClick={() => !editing && onMaximize(id)}
       onDragOver={e => { e.preventDefault(); setIsDragOver(true); }}
-      onDragLeave={() => setIsDragOver(false)}
+      onDragLeave={e => {
+        if (!e.currentTarget.contains(e.relatedTarget as Node)) {
+          setIsDragOver(false);
+        }
+      }}
       onDrop={e => { e.preventDefault(); setIsDragOver(false); onDrop(id); }}
     >
       <div className={styles.header}>
         <span
           className={styles.grip}
           draggable
-          onDragStart={e => { e.stopPropagation(); onDragStart(id); }}
+          onDragStart={() => onDragStart(id)}
           onClick={e => e.stopPropagation()}
         >⠿</span>
         <span className={`${styles.status} ${styles[status]}`}>{statusLabel}</span>
