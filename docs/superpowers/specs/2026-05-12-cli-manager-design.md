@@ -39,7 +39,8 @@ node-pty (main) ──IPC:pty-data──► xterm.js (renderer) ──displayed 
 
 | Channel | Direction | Payload |
 |---|---|---|
-| `pty:create` | renderer → main | `{ path: string }` |
+| `pty:create` | renderer → main | `{ path: string, title?: string }` |
+| `pty:created` | main → renderer | `{ id: string }` — response after spawn |
 | `pty:input` | renderer → main | `{ id, data: string }` |
 | `pty:destroy` | renderer → main | `{ id }` |
 | `pty:data` | main → renderer | `{ id, data: string }` |
@@ -85,7 +86,7 @@ From top to bottom within the fixed-height cell:
 Triggered by clicking any cell. Renders as a full-window overlay above the grid.
 
 - **Header bar** — status badge, terminal title (or path if no title), Minimize button, Close button
-- **Full xterm instance** — same xterm.js instance as the cell, now full-size, `pointer-events: auto`, keyboard input active
+- **Full xterm instance** — a dedicated full-size xterm.js instance connected to the same PTY data stream. Not the same DOM node as the grid cell — the overlay creates its own xterm, subscribes to `pty:data` for that ID, and routes keystrokes via `pty:input`. The grid cell's preview xterm continues buffering in the background.
 - **Hint text** — small dimmed label: "Input active — type your response and press Enter"
 - Clicking Minimize dismisses the overlay and returns to the grid; the PTY keeps running
 
@@ -142,7 +143,7 @@ Status returns to `running` as soon as new output arrives from the PTY (indicati
 
 1. User clicks `+ New` → dialog opens
 2. User picks path (and optional title) → `pty:create` sent to main
-3. Main spawns `node-pty` process, assigns UUID, returns it via `pty:data`
+3. Main spawns `node-pty` process, assigns a UUID, sends `pty:created` with the ID back to renderer
 4. Renderer creates xterm.js instance, attaches to that UUID, adds cell to grid
 5. While running: main streams output via `pty:data`, fires `pty:status` on state changes
 6. User clicks `✕` on cell → `pty:destroy` → main kills PTY → renderer removes cell
