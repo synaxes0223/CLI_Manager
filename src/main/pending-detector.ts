@@ -33,13 +33,12 @@ export function createPendingDetector(patterns = DEFAULT_PATTERNS): PendingDetec
 
   return {
     feed(data) {
-      const matchesPending = patterns.some(p => p.test(data));
+      // Reset lastIndex before each test to guard against g/y flag bugs on reused patterns.
+      const matchesPending = patterns.some(p => { p.lastIndex = 0; return p.test(data); });
       if (matchesPending) {
-        if (current !== 'pending') {
-          emit('running');
-        }
         if (timer) clearTimeout(timer);
         timer = null;
+        // Go directly to pending — skip an intermediate 'running' flash on the same chunk.
         emit('pending');
       } else {
         emit('running');
@@ -47,6 +46,7 @@ export function createPendingDetector(patterns = DEFAULT_PATTERNS): PendingDetec
       }
     },
     onStatusChange(handler) {
+      // Only one subscriber supported; calling again replaces the previous handler.
       cb = handler;
     },
     destroy() {

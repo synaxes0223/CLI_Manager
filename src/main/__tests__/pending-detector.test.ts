@@ -70,14 +70,18 @@ describe('createPendingDetector', () => {
     det.onStatusChange(cb);
     det.feed('claude >');
     det.feed('claude >'); // same status — should not re-emit
-    expect(cb).toHaveBeenCalledTimes(2); // running then pending (only once each)
+    expect(cb).toHaveBeenCalledTimes(1); // pending only once; no duplicate emission
   });
 
   it('destroy clears timer', () => {
     const det = createPendingDetector();
+    const cb = vi.fn();
+    det.onStatusChange(cb);
     det.feed('some output\n');
+    cb.mockClear();
     det.destroy();
     // should not throw or emit after destroy
     vi.advanceTimersByTime(15000);
+    expect(cb).not.toHaveBeenCalled();
   });
 });
