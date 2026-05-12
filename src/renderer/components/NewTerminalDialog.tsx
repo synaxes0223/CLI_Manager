@@ -12,9 +12,8 @@ export function NewTerminalDialog({ lastPath, onCreate, onCancel }: Props) {
   const [title, setTitle] = useState('');
 
   async function handleBrowse() {
-    // electron showOpenDialog is exposed via api if needed;
-    // for now, the user types the path manually.
-    // Future: add window.api.browseFolder() to preload.
+    const selected = await window.api.browseFolder();
+    if (selected) setPath(selected);
   }
 
   function handleCreate() {

@@ -11,6 +11,7 @@ declare global {
       sendInput:  (p: PtyInputPayload)   => void;
       resizePty:  (p: PtyResizePayload)  => void;
       destroyPty: (p: PtyDestroyPayload) => void;
+      browseFolder: () => Promise<string | null>;
       onData:   (cb: (p: PtyDataPayload)   => void) => () => void;
       onStatus: (cb: (p: PtyStatusPayload) => void) => () => void;
       onExit:   (cb: (p: PtyExitPayload)   => void) => () => void;
