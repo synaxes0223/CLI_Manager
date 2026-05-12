@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import type { TerminalState } from '../../types';
+import { reorder } from '../lib/reorder';
 
 export function useTerminals() {
   const [terminals, setTerminals] = useState<TerminalState[]>([]);
@@ -32,5 +33,14 @@ export function useTerminals() {
     );
   }, []);
 
-  return { terminals, createTerminal, destroyTerminal, renameTerminal };
+  const reorderTerminals = useCallback((fromId: string, toId: string) => {
+    setTerminals(prev => {
+      const from = prev.findIndex(t => t.id === fromId);
+      const to   = prev.findIndex(t => t.id === toId);
+      if (from === -1 || to === -1 || from === to) return prev;
+      return reorder(prev, from, to);
+    });
+  }, []);
+
+  return { terminals, createTerminal, destroyTerminal, renameTerminal, reorderTerminals };
 }
