@@ -37,7 +37,11 @@ npm run package
 
 This compiles the app and produces an NSIS installer at `release/CLI Manager Setup x.y.z.exe`. Run the installer to install the app and create a desktop shortcut — no terminal required to launch after that.
 
-> **Note:** The first build downloads Electron binaries (~80 MB) and may take a few minutes.
+> **Windows symlink requirement:** electron-builder's code-signing toolkit contains symlinks. Windows blocks these for standard users. Fix with either:
+> - **Developer Mode** (recommended): Settings → Privacy & Security → For developers → turn on Developer Mode, then re-run `npm run package`
+> - **Run as Administrator**: open your terminal as Administrator and run `npm run package`
+>
+> **First build** also downloads Electron binaries (~80 MB) and may take a few minutes.
 
 ## Scripts
 
