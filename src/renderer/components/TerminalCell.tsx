@@ -36,16 +36,19 @@ export function TerminalCell({ terminal, onMaximize, onClose, onRename }: Props)
     fit.fit();
 
     xtermStore.set(id, { term, fit });
+    window.api.resizePty({ id, cols: term.cols, rows: term.rows });
 
     const unsub = ptyBus.subscribe(id, data => term.write(data));
-    const observer = new ResizeObserver(() => fit.fit());
+    const observer = new ResizeObserver(() => {
+      fit.fit();
+      window.api.resizePty({ id, cols: term.cols, rows: term.rows });
+    });
     observer.observe(containerRef.current);
 
     return () => {
       unsub();
       observer.disconnect();
       xtermStore.remove(id);
-      term.dispose();
     };
   }, [id]);
 

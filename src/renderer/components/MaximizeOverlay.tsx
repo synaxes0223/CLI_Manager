@@ -45,7 +45,6 @@ export function MaximizeOverlay({ terminal, onMinimize, onClose }: Props) {
       inputDisposable.current?.dispose();
       inputDisposable.current = null;
       entry.fit.fit();
-      window.api.resizePty({ id, cols: entry.term.cols, rows: entry.term.rows });
     };
   }, [id]);
 

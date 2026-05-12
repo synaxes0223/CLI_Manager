@@ -18,7 +18,13 @@ export function App() {
   async function handleCreate(path: string, title?: string) {
     setLastPath(path);
     setShowDialog(false);
-    await createTerminal(path, title);
+    try {
+      await createTerminal(path, title);
+    } catch (err) {
+      // Re-open dialog with error visible (simplest: just alert for now)
+      alert(`Failed to create terminal: ${err instanceof Error ? err.message : String(err)}`);
+      setShowDialog(true);
+    }
   }
 
   function handleClose(id: string) {

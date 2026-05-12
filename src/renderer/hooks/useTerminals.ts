@@ -15,9 +15,10 @@ export function useTerminals() {
   }, []);
 
   const createTerminal = useCallback(async (path: string, title?: string) => {
-    const { id } = await window.api.createPty({ path, title });
-    setTerminals(prev => [...prev, { id, path, title, status: 'running' }]);
-    return id;
+    const result = await window.api.createPty({ path, title });
+    if ('error' in result) throw new Error(result.error as string);
+    setTerminals(prev => [...prev, { id: result.id, path, title, status: 'running' }]);
+    return result.id;
   }, []);
 
   const destroyTerminal = useCallback((id: string) => {

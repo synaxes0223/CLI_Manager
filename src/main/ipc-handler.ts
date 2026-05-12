@@ -11,8 +11,12 @@ export function setupIpc(win: BrowserWindow): () => void {
   });
 
   ipcMain.handle(IPC.PTY_CREATE, (_e, p: PtyCreatePayload) => {
-    const id = mgr.create(p.path, p.title);
-    return { id };
+    try {
+      const id = mgr.create(p.path, p.title);
+      return { id };
+    } catch (err) {
+      return { error: err instanceof Error ? err.message : String(err) };
+    }
   });
 
   const onInput   = (_e: Electron.IpcMainEvent, p: PtyInputPayload)   => mgr.write(p.id, p.data);
